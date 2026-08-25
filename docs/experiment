@@ -1,0 +1,57 @@
+# Experiment 1: MiniLM Semantic Similarity
+
+## Goal
+Check if a local MiniLM embedding model can tell whether a user's free-text answer means the same thing as the stored vocabulary definition.
+
+## Setup
+Used `sentence-transformers/all-MiniLM-L6-v2` to embed both the definition and the user's answer, then compared them with cosine similarity. Hypothesis: correct paraphrases should score higher than wrong answers.
+
+## Results
+
+| Definition | Answer | Type | Similarity |
+|---|---|---|---:|
+| happy and cheerful | very happy | Correct | 0.607 |
+| happy and cheerful | angry and upset | Incorrect | 0.474 |
+| a place where books are kept to read or borrow | a place to borrow books | Correct | 0.892 |
+| a place where books are kept to read or borrow | a place where people buy food | Incorrect | 0.456 |
+| to move quickly on foot | to run fast | Correct | 0.646 |
+| to move quickly on foot | to sleep deeply | Incorrect | 0.396 |
+| very large in size or amount | extremely big | Correct | 0.726 |
+| very large in size or amount | very small | Incorrect | 0.702 |
+| fear or worry about something that may happen | feeling scared about what might happen | Correct | 0.782 |
+| fear or worry about something that may happen | feeling completely relaxed | Incorrect | 0.371 |
+
+## Takeaway
+Most of the time, correct answers scored clearly higher than incorrect ones. But the "large" vs "small" case broke this — 0.726 vs 0.702, barely any gap at all.
+
+The problem is that MiniLM measures *relatedness*, not *equivalence*. "Large" and "small" are both about size, so the model places them close together in embedding space — even though they mean opposite things. A simple `similarity ≥ threshold → correct` rule isn't reliable enough on its own, since antonyms can score almost as high as true synonyms.
+
+
+
+
+
+
+## Experiment 2: NLI Model
+
+### Goal
+
+Test whether an NLI model can distinguish correct meanings from opposite meanings.
+
+### Model
+
+`cross-encoder/nli-deberta-v3-base`
+
+### Observation
+
+The NLI model correctly distinguished paraphrases from contradictory answers in our tests.
+
+Example:
+
+- "very large" → "extremely big" → entailment
+- "very large" → "very small" → contradiction
+
+This worked better than using MiniLM cosine similarity alone.
+
+### Conclusion
+
+NLI appears to be a better approach for evaluating free-text quiz answers.

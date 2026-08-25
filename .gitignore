@@ -1,0 +1,14 @@
+
+# Python generated files
+__pycache__/
+*.pyc
+
+# Virtual environment
+.venv/
+
+# Secrets
+.env
+
+# Personal/local learning data
+data/memory_history.csv
+.vscode/
