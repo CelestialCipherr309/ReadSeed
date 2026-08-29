@@ -215,6 +215,8 @@ def add_review_event(user_id, word_id,was_correct, review_type):
     cursor.close()
     conn.close()
     return review_event_id
+# Retrieves the current SM-2 state of a word for a specific user
+# from the user_words table.
 def get_user_word_state(user_id,word_id):
     conn=get_connection()
     cursor=conn.cursor()
@@ -237,3 +239,31 @@ def get_user_word_state(user_id,word_id):
         "ease_factor":float(result[2])
 
     }
+
+# Updates the SM-2 state of a user's word after a review.
+# Saves the new repetition count, interval, and ease factor.
+def update_user_word_sm2(
+        user_id,
+        word_id,
+        repetitions,
+        interval_days,
+        ease_factor
+):
+    conn=get_connection()
+    cursor=conn.cursor()
+
+    cursor.execute(
+        """
+    UPDATE user_words
+    SET repetitions=%s,
+    interval_days=%s,
+    ease_factor=%s
+    WHERE user_id=%s AND word_id=%s
+        """,
+        (repetitions, interval_days, ease_factor,user_id, word_id)
+    )
+    conn.commit()
+    updated_rows=cursor.rowcount
+    cursor.close()
+    conn.close()
+    return updated_rows

@@ -23,8 +23,5 @@ def review_card(repetitions,previous_interval, ease_factor,quality):
     new_ease_factor=update_ease_factor(ease_factor, quality)
 
     return repetitions,new_interval, new_ease_factor
-print(review_card(0, 0, 2.5, 5))
-print(review_card(1, 1, 2.6, 4))
-print(review_card(2, 6, 2.6, 3))
-print(review_card(3, 16, 2.5, 2))
+
 
