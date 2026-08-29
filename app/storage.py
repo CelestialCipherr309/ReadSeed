@@ -215,4 +215,25 @@ def add_review_event(user_id, word_id,was_correct, review_type):
     cursor.close()
     conn.close()
     return review_event_id
+def get_user_word_state(user_id,word_id):
+    conn=get_connection()
+    cursor=conn.cursor()
+    cursor.execute(
+        """
+        SELECT repetitions, interval_days,ease_factor
+        FROM user_words
+        WHERE user_id=%s AND word_id=%s
+        """,
+        (user_id,word_id)
+    )
+    result=cursor.fetchone()
+    cursor.close()
+    conn.close()
+    if result is None:
+        return None
+    return {
+        "repetitions":result[0],
+        "previous_interval":result[1],
+        "ease_factor":float(result[2])
 
+    }
