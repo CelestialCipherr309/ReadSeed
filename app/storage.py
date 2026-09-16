@@ -267,3 +267,81 @@ def update_user_word_sm2(
     cursor.close()
     conn.close()
     return updated_rows
+
+
+def get_fsrs_state(user_id,word_id):
+    conn=get_connection()
+    cursor=conn.cursor()
+
+    cursor.execute(
+        """
+          SELECT  fsrs_state,
+               fsrs_step,
+               fsrs_due,
+               fsrs_stability,
+               fsrs_difficulty,
+               fsrs_last_review
+        FROM user_words
+        WHERE user_id=%s AND word_id=%s;
+        """,
+        (user_id,word_id)
+    )
+
+    result= cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+    if result is None:
+        return None
+
+    return {
+        "state": result[0],
+        "step": result[1],
+        "due": result[2],
+        "stability": result[3],
+        "difficulty": result[4],
+        "last_review": result[5]
+    }
+
+def update_fsrs_state(
+    user_id,
+    word_id,
+    state,
+    step,
+    due,
+    stability,
+    difficulty,
+    last_review
+):
+    conn=get_connection()
+    cursor=conn.cursor()
+
+    cursor.execute(
+        """
+        UPDATE user_words
+        SET fsrs_state = %s,
+            fsrs_step = %s,
+            fsrs_due = %s,
+            fsrs_stability = %s,
+            fsrs_difficulty = %s,
+            fsrs_last_review = %s
+        WHERE user_id = %s
+        AND word_id = %s;
+        """,
+        (
+            state,
+            step,
+            due,
+            stability,
+            difficulty,
+            last_review,
+            user_id,
+            word_id
+        )
+    )
+    conn.commit()
+    updated_rows=cursor.rowcount
+    cursor.close()
+    conn.close()
+    return updated_rows
+    
