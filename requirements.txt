@@ -1,0 +1,7 @@
+streamlit>=1.36
+requests
+fastapi
+uvicorn[standard]
+pandas
+fsrs
+psycopg2-binary
