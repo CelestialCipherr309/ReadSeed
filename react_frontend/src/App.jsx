@@ -18,9 +18,22 @@ function dueText(iso) {
   return d === 1 ? "tomorrow" : `in ${d} days`;
 }
 
-function relatedWords(d) {
-  const items = Array.isArray(d) ? d : d?.related || d?.related_words || d?.words || [];
-  return items.map((x) => (typeof x === "string" ? x : x?.word)).filter(Boolean);
+// Collects related words from whatever shape the backend returns:
+// ["a","b"], [{word:"a"}], {related:[...]}, {synonyms:[...], similar:[...]}, ...
+function relatedWords(d, self = "") {
+  console.debug("related response:", d);
+  const out = new Set();
+  const skip = new Set(["word", "status", "message", "score", "count", "source", "type"]);
+  const walk = (v, inList) => {
+    if (typeof v === "string") { if (inList) out.add(v); }
+    else if (Array.isArray(v)) v.forEach((x) => walk(x, true));
+    else if (v && typeof v === "object") {
+      if (inList && typeof v.word === "string") out.add(v.word);
+      for (const [k, val] of Object.entries(v)) if (!skip.has(k)) walk(val, false);
+    }
+  };
+  walk(d, Array.isArray(d));
+  return [...out].filter((w) => w.toLowerCase() !== self.toLowerCase());
 }
 
 function Meanings({ items = [] }) {
@@ -71,7 +84,7 @@ function Discover({ notify }) {
     notify(r?.message || "Saved to your vocabulary", "ok");
     setRes({ ...res, status: "existing" });
   });
-  const findRelated = run(() => api.related(res.word), (d) => setRel(relatedWords(d)));
+  const findRelated = run(() => api.related(res.word), (d) => setRel(relatedWords(d, res.word)));
   const addPicked = run(() => api.addRelated(pick), (r) => {
     notify(r?.message || `Added ${pick.length} words`, "ok");
     setPick([]);
@@ -221,6 +234,15 @@ function Vocabulary() {
   const [items, setItems] = useState(null);
   const [err, setErr] = useState("");
   const [q, setQ] = useState("");
+  const [open, setOpen] = useState(null);
+  const [detail, setDetail] = useState(null);
+
+  async function show(word) {
+    setOpen(word);
+    setDetail(null);
+    try { setDetail(await api.lookup(word)); }
+    catch (e) { setDetail({ error: e.message }); }
+  }
 
   useEffect(() => {
     api.vocab()
@@ -236,14 +258,30 @@ function Vocabulary() {
       <h1 className="hero">My vocabulary</h1>
       <input className="filter" value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Search ${items.length} words`} />
       <div className="grid">
-        {shown.map((x, i) => (
-          <article key={i} className="card small">
-            <h3 className="headword s">{x.word || String(x)}</h3>
-            <p className="muted">{(x.meanings || x.definitions || [])[0]?.definition}</p>
-          </article>
-        ))}
+        {shown.map((x, i) => {
+          const name = x.word || String(x);
+          return (
+            <button key={i} className="card small clickable" onClick={() => show(name)}>
+              <h3 className="headword s">{name}</h3>
+              <p className="muted">{(x.meanings || x.definitions || [])[0]?.definition || "Click to see meanings"}</p>
+            </button>
+          );
+        })}
       </div>
       {!items.length && <p className="muted">No saved words yet. Look one up on the Discover tab.</p>}
+      {open && (
+        <div className="overlay" onClick={() => setOpen(null)}>
+          <div className="modal card" onClick={(e) => e.stopPropagation()}>
+            <div className="row">
+              <h2 className="headword">{open}</h2>
+              <button className="chip" onClick={() => setOpen(null)}>Close</button>
+            </div>
+            {!detail && <p className="muted">Loading…</p>}
+            {detail?.error && <div className="banner miss">{detail.error}</div>}
+            {detail && !detail.error && <Meanings items={detail.meanings} />}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
