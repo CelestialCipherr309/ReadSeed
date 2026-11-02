@@ -63,3 +63,9 @@ h3 { margin: 0 0 10px; font-size: 1rem; text-transform: uppercase; letter-spacin
 .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 12px 20px; border-radius: 14px; background: var(--surface); border: 1px solid var(--accent); box-shadow: 0 10px 30px #0008; z-index: 10; max-width: 90vw; }
 .toast.error { border-color: var(--miss); }
 @media (max-width: 600px) { .nav { padding: 12px 14px; } .nav nav button { padding: 6px 9px; font-size: .88rem; } .brand { font-size: 1.1rem; } .search { flex-direction: column; } }
+
+/* Clickable vocabulary cards and the meanings popup */
+button.card.clickable { text-align: left; color: inherit; font: inherit; cursor: pointer; transition: border-color .2s, transform .1s; }
+button.card.clickable:hover { border-color: var(--accent); transform: translateY(-2px); }
+.overlay { position: fixed; inset: 0; background: #050a07cc; display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 20; }
+.modal { max-width: 560px; width: 100%; max-height: 80vh; overflow-y: auto; margin: 0; }
