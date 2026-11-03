@@ -11,17 +11,6 @@ The same FastAPI backend powers **two frontends**: a React app and a Streamlit a
 [▶ Watch the demo video](https://youtu.be/3uFkgmSff-8?si=DGwO0MgNytVzOb_l)
 
 
-
-## Screenshots
-
-| Discover | Practice |
-| --- | --- |
-| ![Discover page](c:\Users\devya\OneDrive\Pictures\Screenshots\Screenshot 2026-11-02 220721.png , c:\Users\devya\OneDrive\Pictures\Screenshots\Screenshot 2026-11-02 220655.png) | ![Practice page](c:\Users\devya\OneDrive\Pictures\Screenshots\Screenshot 2026-11-02 220740.png) |
-
-| Quiz feedback | My vocabulary |
-| --- | --- |
-| ![Quiz feedback](c:\Users\devya\OneDrive\Pictures\Screenshots\Screenshot 2026-11-03 154828.png) | ![My vocabulary](c:\Users\devya\OneDrive\Pictures\Screenshots\Screenshot 2026-11-02 220801.png) |
-
 ## Features
 
 - **Discover words:** look up a word and read its meanings, grouped by part of speech. Misspellings get a "Did you mean…?" suggestion.
